@@ -1,7 +1,7 @@
 --[[
     Merged Aimbot com UI Customizada
     Combina funcionalidades avançadas (FOV, configurações, etc.) do Merged Aimbot com uma interface
-    baseada na UI que você enviou, que possui uma sidebar com abas laterais.
+    baseada na UI que possui uma sidebar com abas laterais.
     Personalize as configurações e integrações conforme necessário.
 ]]
 
@@ -254,9 +254,373 @@ end)
 
 ------------------------------------------------------------
 -- Integração dos Controles do Merged Aimbot
--- Nesta seção você pode adicionar os controles (toggles, sliders, botões, etc.)
--- dentro de cada página (por exemplo, na aba "Aimbot") para alterar as configurações.
+-- Nesta seção são adicionados os controles (toggles, sliders, botões, etc.)
+-- dentro de cada página para alterar as configurações.
 ------------------------------------------------------------
+
+-- Exemplo de Toggle Switch para Ativar/Desativar o Aimbot (na aba "Aimbot")
+do
+    local switchFrame = Instance.new("Frame")
+    switchFrame.Size = UDim2.new(0, 60, 0, 34)
+    switchFrame.Position = UDim2.new(0, 10, 0, 50)  -- Ajuste conforme necessário
+    switchFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+    switchFrame.BorderRadius = UDim.new(0, 17)
+    switchFrame.Parent = pages["Aimbot"]
+
+    local sliderButton = Instance.new("TextButton")
+    sliderButton.Size = UDim2.new(0, 30, 0, 30)
+    sliderButton.Position = UDim2.new(0, 2, 0, 2)
+    sliderButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    sliderButton.BorderRadius = UDim.new(0, 15)
+    sliderButton.Text = ""
+    sliderButton.Parent = switchFrame
+
+    local isAimbotEnabled = false
+
+    local function updateSwitch()
+        if isAimbotEnabled then
+            sliderButton.Position = UDim2.new(0, 32, 0, 2)
+            switchFrame.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        else
+            sliderButton.Position = UDim2.new(0, 2, 0, 2)
+            switchFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+        end
+    end
+
+    sliderButton.MouseButton1Click:Connect(function()
+        isAimbotEnabled = not isAimbotEnabled
+        updateSwitch()
+        MergedAimbot.Settings.Enabled = isAimbotEnabled
+    end)
+
+    updateSwitch()
+end
+
+-- A parte do misc
+
+do
+    local miscPage = pages["Misc"]
+    local currentY = 40
+
+    -- Função auxiliar para criar labels (usada para os créditos)
+    local function createLabel(text, height)
+        local label = Instance.new("TextLabel")
+        label.Size = UDim2.new(1, -20, 0, height or 20)
+        label.Position = UDim2.new(0, 10, 0, currentY)
+        label.BackgroundTransparency = 1
+        label.Text = text
+        label.TextColor3 = Color3.new(1, 1, 1)
+        label.Font = Enum.Font.Gotham
+        label.TextSize = 16
+        label.Parent = miscPage
+        currentY = currentY + (height or 20) + 5
+    end
+
+    -- Botão do Discord
+    local discordButton = Instance.new("TextButton")
+    discordButton.Size = UDim2.new(0, 200, 0, 30)
+    discordButton.Position = UDim2.new(0, 10, 0, currentY)
+    discordButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    discordButton.TextColor3 = Color3.new(1, 1, 1)
+    discordButton.Font = Enum.Font.GothamBold
+    discordButton.TextSize = 16
+    discordButton.Text = "Discord"
+    discordButton.Parent = miscPage
+    discordButton.MouseButton1Click:Connect(function()
+        local url = "https://discord.gg/tuEawMf34u"
+        local success = pcall(function() GuiService:OpenBrowserWindow(url) end)
+        if not success then
+            setclipboard(url)
+        end
+    end)
+    currentY = currentY + 40
+
+    -- Botão do YouTube
+    local youtubeButton = Instance.new("TextButton")
+    youtubeButton.Size = UDim2.new(0, 200, 0, 30)
+    youtubeButton.Position = UDim2.new(0, 10, 0, currentY)
+    youtubeButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    youtubeButton.TextColor3 = Color3.new(1, 1, 1)
+    youtubeButton.Font = Enum.Font.GothamBold
+    youtubeButton.TextSize = 16
+    youtubeButton.Text = "YouTube"
+    youtubeButton.Parent = miscPage
+    youtubeButton.MouseButton1Click:Connect(function()
+        local url = "https://youtube.com/@jinx_scripts?si=nt9aWeD2lRY7Ok9N"
+        local success = pcall(function() GuiService:OpenBrowserWindow(url) end)
+        if not success then
+            setclipboard(url)
+        end
+    end)
+    currentY = currentY + 60
+
+    -- Créditos
+    createLabel("DESTRUA-SE ROBLOX", 25)
+    createLabel("Jinxscripts", 25)
+    createLabel("\"not\" Justadev", 25)
+end
+
+-- Toggle Switch para Ativar/Desativar o ESP (na aba "ESP")
+do
+    local switchFrame = Instance.new("Frame")
+    switchFrame.Size = UDim2.new(0, 60, 0, 34)
+    switchFrame.Position = UDim2.new(0, 10, 0, 50)  -- Ajuste conforme necessário
+    switchFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+    switchFrame.BorderRadius = UDim.new(0, 17)
+    switchFrame.Parent = pages["ESP"]
+
+    local sliderButton = Instance.new("TextButton")
+    sliderButton.Size = UDim2.new(0, 30, 0, 30)
+    sliderButton.Position = UDim2.new(0, 2, 0, 2)
+    sliderButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    sliderButton.BorderRadius = UDim.new(0, 15)
+    sliderButton.Text = ""
+    sliderButton.Parent = switchFrame
+
+    local isESPEnabled = MergedAimbot.ESPEnabled
+
+    local function updateSwitch()
+        if isESPEnabled then
+            sliderButton.Position = UDim2.new(0, 32, 0, 2)
+            switchFrame.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        else
+            sliderButton.Position = UDim2.new(0, 2, 0, 2)
+            switchFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+        end
+    end
+
+    sliderButton.MouseButton1Click:Connect(function()
+        isESPEnabled = not isESPEnabled
+        updateSwitch()
+        MergedAimbot.ESPEnabled = isESPEnabled
+    end)
+
+    updateSwitch()
+end
+
+------------------------------------------------------------
+-- Controles na Aba "Config" (FOV e Rainbow)
+------------------------------------------------------------
+do
+    local configPage = pages["Config"]
+    
+    -- Container para os controles de configuração
+    local configControlsFrame = Instance.new("Frame")
+    configControlsFrame.Name = "ConfigControls"
+    configControlsFrame.Size = UDim2.new(1, -20, 1, -50)
+    configControlsFrame.Position = UDim2.new(0, 10, 0, 40)
+    configControlsFrame.BackgroundTransparency = 1
+    configControlsFrame.Parent = configPage
+    
+    local currentY = 0
+
+    -- Função auxiliar para criar labels
+    local function createLabel(text, parent)
+        local label = Instance.new("TextLabel")
+        label.Text = text
+        label.Font = Enum.Font.Gotham
+        label.TextSize = 16
+        label.TextColor3 = Color3.new(1,1,1)
+        label.BackgroundTransparency = 1
+        label.Size = UDim2.new(1,0,0,20)
+        label.Position = UDim2.new(0,0,0,currentY)
+        label.Parent = parent
+        currentY = currentY + 25
+        return label
+    end
+
+    -- Toggle para habilitar/desabilitar a exibição do FOV
+    do
+        createLabel("Exibir FOV", configControlsFrame)
+        local toggleFrame = Instance.new("Frame")
+        toggleFrame.Size = UDim2.new(0, 60, 0, 34)
+        toggleFrame.Position = UDim2.new(0, 10, 0, currentY)
+        toggleFrame.BackgroundColor3 = Color3.fromRGB(200,200,200)
+        toggleFrame.BorderSizePixel = 0
+        toggleFrame.Parent = configControlsFrame
+
+        local toggleButton = Instance.new("TextButton")
+        toggleButton.Size = UDim2.new(0, 30, 0, 30)
+        toggleButton.Position = UDim2.new(0, 2, 0, 2)
+        toggleButton.BackgroundColor3 = Color3.fromRGB(255,255,255)
+        toggleButton.BorderSizePixel = 0
+        toggleButton.Text = ""
+        toggleButton.Parent = toggleFrame
+
+        local isFOVEnabled = MergedAimbot.FOVSettings.Enabled
+
+        local function updateToggle()
+            if isFOVEnabled then
+                toggleButton.Position = UDim2.new(0, 32, 0, 2)
+                toggleFrame.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+            else
+                toggleButton.Position = UDim2.new(0, 2, 0, 2)
+                toggleFrame.BackgroundColor3 = Color3.fromRGB(200,200,200)
+            end
+        end
+
+        toggleButton.MouseButton1Click:Connect(function()
+            isFOVEnabled = not isFOVEnabled
+            MergedAimbot.FOVSettings.Enabled = isFOVEnabled
+            FOVCircle.Visible = isFOVEnabled
+            updateToggle()
+        end)
+        updateToggle()
+        currentY = currentY + 40
+    end
+
+    -- Slider para ajustar o raio do FOV
+    do
+        local fovLabel = createLabel("Raio do FOV: " .. MergedAimbot.FOVSettings.Radius, configControlsFrame)
+        local sliderFrame = Instance.new("Frame")
+        sliderFrame.Size = UDim2.new(0.8, 0, 0, 20)
+        sliderFrame.Position = UDim2.new(0, 10, 0, currentY)
+        sliderFrame.BackgroundColor3 = Color3.fromRGB(100,100,100)
+        sliderFrame.Parent = configControlsFrame
+
+        local knob = Instance.new("Frame")
+        knob.Size = UDim2.new(0, 10, 1, 0)
+        knob.Position = UDim2.new((MergedAimbot.FOVSettings.Radius/180), 0, 0, 0)
+        knob.BackgroundColor3 = Color3.new(1,1,1)
+        knob.Parent = sliderFrame
+
+        local draggingSlider = false
+        knob.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                draggingSlider = true
+            end
+        end)
+        knob.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                draggingSlider = false
+            end
+        end)
+        sliderFrame.InputChanged:Connect(function(input)
+            if draggingSlider and input.UserInputType == Enum.UserInputType.MouseMovement then
+                local relativeX = math.clamp(input.Position.X - sliderFrame.AbsolutePosition.X, 0, sliderFrame.AbsoluteSize.X)
+                local scale = relativeX / sliderFrame.AbsoluteSize.X
+                knob.Position = UDim2.new(scale, 0, 0, 0)
+                local newFOV = math.floor(scale * 180)
+                MergedAimbot.FOVSettings.Radius = newFOV
+                fovLabel.Text = "Raio do FOV: " .. newFOV
+                FOVCircle.Radius = newFOV
+            end
+        end)
+        currentY = currentY + 30
+    end
+
+    -- Botão para alterar a cor do FOV (simula um color picker)
+    do
+        createLabel("Cor do FOV", configControlsFrame)
+        local colorButton = Instance.new("TextButton")
+        colorButton.Size = UDim2.new(0, 100, 0, 30)
+        colorButton.Position = UDim2.new(0, 10, 0, currentY)
+        colorButton.Text = "Alterar Cor"
+        colorButton.BackgroundColor3 = MergedAimbot.FOVSettings.Color
+        colorButton.TextColor3 = Color3.new(0,0,0)
+        colorButton.Parent = configControlsFrame
+
+        -- Preset de cores para o FOV
+        local colors = {
+            Color3.fromRGB(255, 0, 0),
+            Color3.fromRGB(0, 255, 0),
+            Color3.fromRGB(0, 0, 255),
+            Color3.fromRGB(255, 255, 255),
+            Color3.fromRGB(255, 255, 0),
+        }
+        local colorIndex = 1
+        colorButton.MouseButton1Click:Connect(function()
+            colorIndex = colorIndex % #colors + 1
+            local newColor = colors[colorIndex]
+            MergedAimbot.FOVSettings.Color = newColor
+            colorButton.BackgroundColor3 = newColor
+            if not MergedAimbot.FOVSettings.RainbowColor then
+                FOVCircle.Color = newColor
+            end
+        end)
+        currentY = currentY + 40
+    end
+
+    -- Toggle para o efeito RainbowColor
+    do
+        createLabel("Efeito Rainbow", configControlsFrame)
+        local toggleFrame = Instance.new("Frame")
+        toggleFrame.Size = UDim2.new(0, 60, 0, 34)
+        toggleFrame.Position = UDim2.new(0, 10, 0, currentY)
+        toggleFrame.BackgroundColor3 = Color3.fromRGB(200,200,200)
+        toggleFrame.BorderSizePixel = 0
+        toggleFrame.Parent = configControlsFrame
+
+        local toggleButton = Instance.new("TextButton")
+        toggleButton.Size = UDim2.new(0, 30, 0, 30)
+        toggleButton.Position = UDim2.new(0, 2, 0, 2)
+        toggleButton.BackgroundColor3 = Color3.fromRGB(255,255,255)
+        toggleButton.BorderSizePixel = 0
+        toggleButton.Text = ""
+        toggleButton.Parent = toggleFrame
+
+        local isRainbow = MergedAimbot.FOVSettings.RainbowColor
+
+        local function updateToggle()
+            if isRainbow then
+                toggleButton.Position = UDim2.new(0, 32, 0, 2)
+                toggleFrame.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+            else
+                toggleButton.Position = UDim2.new(0, 2, 0, 2)
+                toggleFrame.BackgroundColor3 = Color3.fromRGB(200,200,200)
+            end
+        end
+
+        toggleButton.MouseButton1Click:Connect(function()
+            isRainbow = not isRainbow
+            MergedAimbot.FOVSettings.RainbowColor = isRainbow
+            updateToggle()
+        end)
+        updateToggle()
+        currentY = currentY + 40
+    end
+
+    -- Slider para ajustar a velocidade do efeito Rainbow
+    do
+        local rainbowLabel = createLabel("Velocidade Rainbow: " .. MergedAimbot.FOVSettings.RainbowSpeed, configControlsFrame)
+        local sliderFrame = Instance.new("Frame")
+        sliderFrame.Size = UDim2.new(0.8, 0, 0, 20)
+        sliderFrame.Position = UDim2.new(0, 10, 0, currentY)
+        sliderFrame.BackgroundColor3 = Color3.fromRGB(100,100,100)
+        sliderFrame.Parent = configControlsFrame
+
+        local knob = Instance.new("Frame")
+        knob.Size = UDim2.new(0, 10, 1, 0)
+        local currentSpeed = MergedAimbot.FOVSettings.RainbowSpeed
+        local normalizedSpeed = (currentSpeed - 0.1) / (5 - 0.1)
+        knob.Position = UDim2.new(normalizedSpeed, 0, 0, 0)
+        knob.BackgroundColor3 = Color3.new(1,1,1)
+        knob.Parent = sliderFrame
+
+        local draggingSlider = false
+        knob.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                draggingSlider = true
+            end
+        end)
+        knob.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                draggingSlider = false
+            end
+        end)
+        sliderFrame.InputChanged:Connect(function(input)
+            if draggingSlider and input.UserInputType == Enum.UserInputType.MouseMovement then
+                local relativeX = math.clamp(input.Position.X - sliderFrame.AbsolutePosition.X, 0, sliderFrame.AbsoluteSize.X)
+                local scale = relativeX / sliderFrame.AbsoluteSize.X
+                knob.Position = UDim2.new(scale, 0, 0, 0)
+                local newSpeed = 0.1 + scale * (5 - 0.1)
+                MergedAimbot.FOVSettings.RainbowSpeed = newSpeed
+                rainbowLabel.Text = "Velocidade Rainbow: " .. string.format("%.2f", newSpeed)
+            end
+        end)
+        currentY = currentY + 30
+    end
+end
 
 print("Merged Aimbot com UI customizada carregado com sucesso!")
 
@@ -376,27 +740,42 @@ end)
 ------------------------------------------------------------
 RunService.Heartbeat:Connect(function()
     if MergedAimbot.ESPEnabled then
-        for _, player in pairs(Players:GetPlayers()) do
+        for _, player in ipairs(Players:GetPlayers()) do
             if player ~= LocalPlayer and player.Character then
                 local character = player.Character
-                local hrp = character:FindFirstChild("HumanoidRootPart")
-                if hrp then
-                    local esp = character:FindFirstChild("ESP")
-                    if not esp then
-                        esp = Instance.new("BillboardGui")
-                        esp.Name = "ESP"
-                        esp.Parent = character
-                        esp.Adornee = hrp
-                        esp.Size = UDim2.new(0, 200, 0, 50)
-                        esp.StudsOffset = Vector3.new(0, 2, 0)
-
-                        local label = Instance.new("TextLabel", esp)
-                        label.Size = UDim2.new(1, 0, 1, 0)
-                        label.BackgroundTransparency = 1
-                        label.TextColor3 = player.TeamColor.Color
-                        label.Text = player.Name
-                        label.TextScaled = true
+                local humanoid = character:FindFirstChildOfClass("Humanoid")
+                if humanoid and humanoid.Health > 0 then
+                    -- Define a cor do contorno: usa a cor do time, ou branco se neutro/não houver time
+                    local teamColor = Color3.new(1, 1, 1)
+                    if player.Team and player.TeamColor then
+                        teamColor = player.TeamColor.Color
                     end
+
+                    local highlight = character:FindFirstChild("ESP_Highlight")
+                    if not highlight then
+                        highlight = Instance.new("Highlight")
+                        highlight.Name = "ESP_Highlight"
+                        highlight.FillTransparency = 1
+                        highlight.OutlineTransparency = 0
+                        highlight.OutlineColor3 = teamColor
+                        highlight.Parent = character
+                    else
+                        highlight.OutlineColor3 = teamColor
+                    end
+                else
+                    local highlight = character:FindFirstChild("ESP_Highlight")
+                    if highlight then
+                        highlight:Destroy()
+                    end
+                end
+            end
+        end
+    else
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character then
+                local highlight = player.Character:FindFirstChild("ESP_Highlight")
+                if highlight then
+                    highlight:Destroy()
                 end
             end
         end
