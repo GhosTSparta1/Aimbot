@@ -1,9 +1,8 @@
 --[[
-  Merged Aimbot Script by ChatGPT
-  Combina funcionalidades avançadas (FOV, lock modes, Tween) com uma GUI interativa, ESP e modos de disparo.
-  Desenvolvido integrando aspectos dos dois scripts originais.
-  
-  Atenção: Alguns métodos (como mousemoverel, mouse1click, etc.) podem depender do executor utilizado.
+    Merged Aimbot com UI Customizada
+    Combina funcionalidades avançadas (FOV, configurações, etc.) do Merged Aimbot com uma interface
+    baseada na UI que você enviou, que possui uma sidebar com abas laterais.
+    Personalize as configurações e integrações conforme necessário.
 ]]
 
 ------------------------------------------------------------
@@ -17,41 +16,11 @@ local GuiService = game:GetService("GuiService")
 local Camera = workspace.CurrentCamera
 
 local LocalPlayer = Players.LocalPlayer
-local Mouse = LocalPlayer:GetMouse()
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local Mouse = LocalPlayer:GetMouse()
 
 ------------------------------------------------------------
--- Função Auxiliar: Tornar uma Frame Arrastável
-------------------------------------------------------------
-local function makeDraggable(frame)
-    local dragging, dragInput, dragStart, startPos
-    frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = frame.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end)
-    frame.InputChanged:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            dragInput = input
-        end
-    end)
-    UserInputService.InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
-            local delta = input.Position - dragStart
-            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
-end
-
-------------------------------------------------------------
--- Configurações Globais do Merged Aimbot
+-- Configurações do Merged Aimbot
 ------------------------------------------------------------
 local MergedAimbot = {
     Settings = {
@@ -94,45 +63,81 @@ local function GetRainbowColor()
 end
 
 ------------------------------------------------------------
--- Criação da Interface (GUI) com Abas Laterais
+-- Função Auxiliar: Tornar uma Frame Arrastável
+------------------------------------------------------------
+local function makeDraggable(frame)
+    local dragging, dragInput, dragStart, startPos = false, nil, nil, nil
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+    frame.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = input
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+end
+
+------------------------------------------------------------
+-- Criação da Interface Customizada (UI)
 ------------------------------------------------------------
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "MergedAimbotUI"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = PlayerGui
+MergedAimbot.ScreenGui = screenGui
 
+-- Container Principal
 local mainContainer = Instance.new("Frame")
 mainContainer.Name = "MainContainer"
-mainContainer.Size = UDim2.new(0.6, 0, 0.7, 0)
-mainContainer.Position = UDim2.new(0.2, 0, 0.15, 0)
+mainContainer.Size = UDim2.new(0.6, 0, 0.7, 0)        -- 60% da largura e 70% da altura da tela
+mainContainer.Position = UDim2.new(0.2, 0, 0.15, 0)     -- Centralizado
 mainContainer.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 mainContainer.BorderSizePixel = 0
 mainContainer.Parent = screenGui
 makeDraggable(mainContainer)
 
+-- Sidebar (abas laterais)
 local sideBar = Instance.new("Frame")
 sideBar.Name = "SideBar"
-sideBar.Size = UDim2.new(0.2, 0, 1, 0)
+sideBar.Size = UDim2.new(0.2, 0, 1, 0)              -- 20% da largura do container principal
 sideBar.Position = UDim2.new(0, 0, 0, 0)
 sideBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 sideBar.BorderSizePixel = 0
 sideBar.Parent = mainContainer
 
+-- Área de Conteúdo (páginas)
 local contentContainer = Instance.new("Frame")
 contentContainer.Name = "ContentContainer"
-contentContainer.Size = UDim2.new(0.8, 0, 1, 0)
+contentContainer.Size = UDim2.new(0.8, 0, 1, 0)         -- 80% do container principal
 contentContainer.Position = UDim2.new(0.2, 0, 0, 0)
 contentContainer.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 contentContainer.BorderSizePixel = 0
 contentContainer.Parent = mainContainer
 
-local tabs = {"Início", "Aimbot", "ESP", "Config", "Misc"}
+-- Criação das Abas e Páginas
+local tabs = {"Aimbot", "ESP", "Config", "Misc"}
 local pages = {}
 local currentPage = nil
-local tabButtonHeight = 40
-local tabSpacing = 5
+local tabButtonHeight = 40  -- Altura fixa de cada aba em pixels
+local tabSpacing = 5        -- Espaçamento entre as abas
 
 for i, tabName in ipairs(tabs) do
+    -- Botão da aba
     local tabButton = Instance.new("TextButton")
     tabButton.Name = "Tab_" .. tabName
     tabButton.Size = UDim2.new(1, 0, 0, tabButtonHeight)
@@ -144,6 +149,7 @@ for i, tabName in ipairs(tabs) do
     tabButton.Text = tabName
     tabButton.Parent = sideBar
 
+    -- Página correspondente no contentContainer
     local page = Instance.new("Frame")
     page.Name = "Page_" .. tabName
     page.Size = UDim2.new(1, 0, 1, 0)
@@ -154,46 +160,34 @@ for i, tabName in ipairs(tabs) do
     page.Parent = contentContainer
     pages[tabName] = page
 
+    -- Título da página
     local pageLabel = Instance.new("TextLabel")
     pageLabel.Name = "TitleLabel"
     pageLabel.Size = UDim2.new(1, 0, 0, 30)
     pageLabel.Position = UDim2.new(0, 0, 0, 0)
     pageLabel.BackgroundTransparency = 1
+    pageLabel.Text = "Configurações de " .. tabName
     pageLabel.TextColor3 = Color3.new(1, 1, 1)
     pageLabel.Font = Enum.Font.GothamSemibold
     pageLabel.TextSize = 18
     pageLabel.Parent = page
 
-    if tabName == "Início" then
-        pageLabel.Text = "DESTRUA-SE ROBLOX"
-
-        local userInfo = Instance.new("TextLabel")
-        userInfo.Name = "UserInfo"
-        userInfo.Size = UDim2.new(1, 0, 0, 80)
-        userInfo.Position = UDim2.new(0, 0, 0, 35)
-        userInfo.BackgroundTransparency = 1
-        userInfo.TextColor3 = Color3.new(1, 1, 1)
-        userInfo.Font = Enum.Font.Gotham
-        userInfo.TextSize = 16
-        userInfo.TextWrapped = true
-        userInfo.Text = "Conta: " .. LocalPlayer.Name .. "\nGame: " .. game.PlaceId .. "\nServidor: " .. game.JobId
-        userInfo.Parent = page
-    else
-        pageLabel.Text = "Configurações de " .. tabName
-    end
-
     tabButton.MouseButton1Click:Connect(function()
-        if currentPage then currentPage.Visible = false end
+        if currentPage then
+            currentPage.Visible = false
+        end
         page.Visible = true
         currentPage = page
     end)
 end
 
+-- Exibe automaticamente a primeira aba
 if #tabs > 0 and pages[tabs[1]] then
     pages[tabs[1]].Visible = true
     currentPage = pages[tabs[1]]
 end
 
+-- Resize Handle para ajustar a largura da Sidebar
 local resizeHandle = Instance.new("Frame")
 resizeHandle.Name = "ResizeHandle"
 resizeHandle.Size = UDim2.new(0, 5, 1, 0)
@@ -234,71 +228,7 @@ resizeHandle.InputChanged:Connect(function(input)
     end
 end)
 
-local bottomContainer = Instance.new("Frame")
-bottomContainer.Name = "BottomContainer"
-bottomContainer.Size = UDim2.new(1, 0, 0, 70)
-bottomContainer.Position = UDim2.new(0, 0, 1, -70)
-bottomContainer.BackgroundTransparency = 1
-bottomContainer.Parent = sideBar
-
-local discordButton = Instance.new("TextButton")
-discordButton.Name = "DiscordButton"
-discordButton.Size = UDim2.new(1, 0, 0, 30)
-discordButton.Position = UDim2.new(0, 0, 0, 0)
-discordButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-discordButton.TextColor3 = Color3.new(1, 1, 1)
-discordButton.Font = Enum.Font.GothamBold
-discordButton.TextSize = 16
-discordButton.Text = " Discord"
-discordButton.Parent = bottomContainer
-
-local discordIcon = Instance.new("ImageLabel")
-discordIcon.Name = "DiscordIcon"
-discordIcon.Size = UDim2.new(0, 30, 0, 30)
-discordIcon.Position = UDim2.new(0, 5, 0, 0)
-discordIcon.BackgroundTransparency = 1
-discordIcon.Image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGew1wzyPacpck97bVtg_oNcwMkgWr2-SSP_gFPGv37W2DvAeQPY7hPOQ&s=10"
-discordIcon.Parent = discordButton
-
-local youtubeButton = Instance.new("TextButton")
-youtubeButton.Name = "YouTubeButton"
-youtubeButton.Size = UDim2.new(1, 0, 0, 30)
-youtubeButton.Position = UDim2.new(0, 0, 0, 35)
-youtubeButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-youtubeButton.TextColor3 = Color3.new(1, 1, 1)
-youtubeButton.Font = Enum.Font.GothamBold
-youtubeButton.TextSize = 16
-youtubeButton.Text = " YouTube"
-youtubeButton.Parent = bottomContainer
-
-local youtubeIcon = Instance.new("ImageLabel")
-youtubeIcon.Name = "YouTubeIcon"
-youtubeIcon.Size = UDim2.new(0, 30, 0, 30)
-youtubeIcon.Position = UDim2.new(0, 5, 0, 0)
-youtubeIcon.BackgroundTransparency = 1
-youtubeIcon.Image = "https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png"
-youtubeIcon.Parent = youtubeButton
-
-discordButton.MouseButton1Click:Connect(function()
-    local url = "https://discord.gg/tuEawMf34u"
-    local success = pcall(function()
-        GuiService:OpenBrowserWindow(url)
-    end)
-    if not success then
-        setclipboard(url)
-    end
-end)
-
-youtubeButton.MouseButton1Click:Connect(function()
-    local url = "https://youtube.com/@jinx_scripts?si=nt9aWeD2lRY7Ok9N"
-    local success = pcall(function()
-        GuiService:OpenBrowserWindow(url)
-    end)
-    if not success then
-        setclipboard(url)
-    end
-end)
-
+-- Botão de Minimizar a UI (alternar visibilidade do container principal)
 local minimizeButton = Instance.new("TextButton")
 minimizeButton.Name = "MinimizeButton"
 minimizeButton.Size = UDim2.new(0, 50, 0, 25)
@@ -323,193 +253,16 @@ minimizeButton.MouseButton1Click:Connect(function()
 end)
 
 ------------------------------------------------------------
--- Integração dos Controles do Merged Aimbot (GUI Secundária)
+-- Integração dos Controles do Merged Aimbot
+-- Nesta seção você pode adicionar os controles (toggles, sliders, botões, etc.)
+-- dentro de cada página (por exemplo, na aba "Aimbot") para alterar as configurações.
 ------------------------------------------------------------
-print("Carregado!")
 
-local function createGUI()
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "MergedAimbotGUI"
-    screenGui.Parent = PlayerGui
-
-    local mainFrame = Instance.new("Frame")
-    mainFrame.Name = "MainFrame"
-    mainFrame.Size = UDim2.new(0, 220, 0, 220)
-    mainFrame.Position = UDim2.new(0, 50, 0, 50)
-    mainFrame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
-    mainFrame.Parent = screenGui
-    makeDraggable(mainFrame)
-
-    local toggleButton = Instance.new("TextButton")
-    toggleButton.Name = "ToggleButton"
-    toggleButton.Size = UDim2.new(0, 200, 0, 40)
-    toggleButton.Position = UDim2.new(0, 10, 0, 10)
-    toggleButton.Text = "Aimbot: OFF"
-    toggleButton.BackgroundColor3 = Color3.new(1, 0, 0)
-    toggleButton.Parent = mainFrame
-
-    local autoFireButton = Instance.new("TextButton")
-    autoFireButton.Name = "AutoFireButton"
-    autoFireButton.Size = UDim2.new(0, 200, 0, 30)
-    autoFireButton.Position = UDim2.new(0, 10, 0, 60)
-    autoFireButton.Text = "Auto Fire: OFF"
-    autoFireButton.Parent = mainFrame
-
-    local holdFireButton = Instance.new("TextButton")
-    holdFireButton.Name = "HoldFireButton"
-    holdFireButton.Size = UDim2.new(0, 200, 0, 30)
-    holdFireButton.Position = UDim2.new(0, 10, 0, 100)
-    holdFireButton.Text = "Hold Fire: OFF"
-    holdFireButton.Parent = mainFrame
-
-    local teamCheckButton = Instance.new("TextButton")
-    teamCheckButton.Name = "TeamCheckButton"
-    teamCheckButton.Size = UDim2.new(0, 200, 0, 30)
-    teamCheckButton.Position = UDim2.new(0, 10, 0, 140)
-    teamCheckButton.Text = "Team Check: ON"
-    teamCheckButton.Parent = mainFrame
-
-    local closeButton = Instance.new("TextButton")
-    closeButton.Name = "CloseButton"
-    closeButton.Size = UDim2.new(0, 25, 0, 25)
-    closeButton.Position = UDim2.new(1, -30, 0, 0)
-    closeButton.Text = "X"
-    closeButton.Parent = mainFrame
-
-    local miniButton = Instance.new("TextButton")
-    miniButton.Name = "MiniButton"
-    miniButton.Size = UDim2.new(0, 50, 0, 50)
-    miniButton.Position = UDim2.new(0, 50, 0, 50)
-    miniButton.Text = "☰"
-    miniButton.Visible = false
-    miniButton.Parent = screenGui
-
-    closeButton.MouseButton1Click:Connect(function()
-        mainFrame.Visible = false
-        miniButton.Visible = true
-    end)
-
-    miniButton.MouseButton1Click:Connect(function()
-        mainFrame.Position = miniButton.Position
-        mainFrame.Visible = true
-        miniButton.Visible = false
-    end)
-
-    return {
-        screenGui = screenGui,
-        mainFrame = mainFrame,
-        toggleButton = toggleButton,
-        autoFireButton = autoFireButton,
-        holdFireButton = holdFireButton,
-        teamCheckButton = teamCheckButton,
-        closeButton = closeButton,
-        miniButton = miniButton,
-    }
-end
-
-local gui = createGUI()
-
-local function updateToggleButton()
-    gui.toggleButton.Text = MergedAimbot.Settings.Enabled and "Aimbot: ON" or "Aimbot: OFF"
-    gui.toggleButton.BackgroundColor3 = MergedAimbot.Settings.Enabled and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
-end
-
-local function updateAutoFireButton()
-    gui.autoFireButton.Text = "Auto Fire: " .. (MergedAimbot.Settings.FireMode == "auto" and "ON" or "OFF")
-end
-
-local function updateHoldFireButton()
-    gui.holdFireButton.Text = "Hold Fire: " .. (MergedAimbot.Settings.FireMode == "hold" and "ON" or "OFF")
-end
-
-local function updateTeamCheckButton()
-    gui.teamCheckButton.Text = "Team Check: " .. (MergedAimbot.Settings.TeamCheck and "ON" or "OFF")
-end
-
-local debounce = {toggle = false, autoFire = false, holdFire = false, teamCheck = false}
-
-gui.toggleButton.MouseButton1Click:Connect(function()
-    if debounce.toggle then return end
-    debounce.toggle = true
-    MergedAimbot.Settings.Enabled = not MergedAimbot.Settings.Enabled
-    updateToggleButton()
-    wait(0.2)
-    debounce.toggle = false
-end)
-
-gui.autoFireButton.MouseButton1Click:Connect(function()
-    if debounce.autoFire then return end
-    debounce.autoFire = true
-    if MergedAimbot.Settings.FireMode == "auto" then
-        MergedAimbot.Settings.FireMode = "none"
-    else
-        MergedAimbot.Settings.FireMode = "auto"
-    end
-    updateAutoFireButton()
-    updateHoldFireButton()
-    wait(0.2)
-    debounce.autoFire = false
-end)
-
-gui.holdFireButton.MouseButton1Click:Connect(function()
-    if debounce.holdFire then return end
-    debounce.holdFire = true
-    if MergedAimbot.Settings.FireMode == "hold" then
-        MergedAimbot.Settings.FireMode = "none"
-    else
-        MergedAimbot.Settings.FireMode = "hold"
-    end
-    updateHoldFireButton()
-    updateAutoFireButton()
-    wait(0.2)
-    debounce.holdFire = false
-end)
-
-gui.teamCheckButton.MouseButton1Click:Connect(function()
-    if debounce.teamCheck then return end
-    debounce.teamCheck = true
-    MergedAimbot.Settings.TeamCheck = not MergedAimbot.Settings.TeamCheck
-    updateTeamCheckButton()
-    wait(0.2)
-    debounce.teamCheck = false
-end)
+print("Merged Aimbot com UI customizada carregado com sucesso!")
 
 ------------------------------------------------------------
--- Funções de Simulação de Clique do Mouse
+-- Função auxiliar para obter o jogador mais próximo (continuação)
 ------------------------------------------------------------
-local function mouse1Click()
-    pcall(function() mouse1click() end)
-end
-
-local function mouse1Press()
-    pcall(function() mouse1press() end)
-end
-
-local function mouse1Release()
-    pcall(function() mouse1release() end)
-end
-
-------------------------------------------------------------
--- Funções Auxiliares para Seleção do Alvo
-------------------------------------------------------------
-local function hasLineOfSight(origin, targetPosition, targetCharacter)
-    local direction = targetPosition - origin
-    local rayParams = RaycastParams.new()
-    rayParams.FilterDescendantsInstances = {LocalPlayer.Character}
-    rayParams.FilterType = Enum.RaycastFilterType.Blacklist
-    local result = workspace:Raycast(origin, direction, rayParams)
-    if result then
-        return result.Instance:IsDescendantOf(targetCharacter)
-    else
-        return true
-    end
-end
-
-local function getDistanceSquared(a, b)
-    local diff = a - b
-    return diff.X * diff.X + diff.Y * diff.Y + diff.Z * diff.Z
-end
-
 local function getNearestPlayer()
     local nearestPlayer = nil
     local shortestDistanceSq = math.huge
@@ -530,19 +283,21 @@ local function getNearestPlayer()
                 continue
             end
 
-            local distanceSq = getDistanceSquared(camPos, targetPart.Position)
             local screenPoint, onScreen = Camera:WorldToViewportPoint(targetPart.Position)
             local mousePos = Vector2.new(UserInputService:GetMouseLocation().X, UserInputService:GetMouseLocation().Y)
             local distToMouse = (Vector2.new(screenPoint.X, screenPoint.Y) - mousePos).Magnitude
 
-            if distToMouse <= MergedAimbot.FOVSettings.Radius and distanceSq < shortestDistanceSq then
-                if MergedAimbot.Settings.WallCheck then
-                    if not hasLineOfSight(camPos, targetPart.Position, player.Character) then
-                        continue
+            if distToMouse <= MergedAimbot.FOVSettings.Radius then
+                local distanceSq = (camPos - targetPart.Position).Magnitude^2
+                if distanceSq < shortestDistanceSq then
+                    if MergedAimbot.Settings.WallCheck then
+                        if not hasLineOfSight(camPos, targetPart.Position, player.Character) then
+                            continue
+                        end
                     end
+                    shortestDistanceSq = distanceSq
+                    nearestPlayer = player
                 end
-                shortestDistanceSq = distanceSq
-                nearestPlayer = player
             end
         end
     end
@@ -653,8 +408,9 @@ end)
 ------------------------------------------------------------
 function MergedAimbot:Exit()
     FOVCircle:Remove()
-    if gui and gui.screenGui then
-        gui.screenGui:Destroy()
+    
+    if MergedAimbot.ScreenGui then
+        MergedAimbot.ScreenGui:Destroy()
     end
     UserInputService.MouseDeltaSensitivity = 1
     self.Settings.Enabled = false
