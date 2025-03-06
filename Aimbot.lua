@@ -547,4 +547,193 @@ do
         local knob = Instance.new("Frame")
         knob.Size = UDim2.new(0, 10, 1, 0)
         local currentSpeed = MergedAimbot.FOVSettings.RainbowSpeed
-        local nor
+        local normalizedSpeed = (currentSpeed - 0.1) / (5 - 0.1)
+        knob.Position = UDim2.new(normalizedSpeed, 0, 0, 0)
+        knob.BackgroundColor3 = Color3.new(1,1,1)
+        knob.Parent = sliderFrame
+
+        local draggingSlider = false
+        knob.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                draggingSlider = true
+            end
+        end)
+        knob.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                draggingSlider = false
+            end
+        end)
+        sliderFrame.InputChanged:Connect(function(input)
+            if draggingSlider and input.UserInputType == Enum.UserInputType.MouseMovement then
+                local relativeX = math.clamp(input.Position.X - sliderFrame.AbsolutePosition.X, 0, sliderFrame.AbsoluteSize.X)
+                local scale = relativeX / sliderFrame.AbsoluteSize.X
+                knob.Position = UDim2.new(scale, 0, 0, 0)
+                local newSpeed = 0.1 + scale * (5 - 0.1)
+                MergedAimbot.FOVSettings.RainbowSpeed = newSpeed
+                rainbowLabel.Text = "Velocidade Rainbow: " .. string.format("%.2f", newSpeed)
+            end
+        end)
+        currentY = currentY + 30
+    end
+end
+
+print("Merged Aimbot com UI customizada carregado com sucesso!")
+
+local function getNearestPlayer()
+    local nearestPlayer = nil
+    local shortestDistanceSq = math.huge
+    local camPos = Camera.CFrame.Position
+
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            if MergedAimbot.Settings.TeamCheck and player.Team == LocalPlayer.Team then
+                continue
+            end
+            local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+            if MergedAimbot.Settings.AliveCheck and (humanoid and humanoid.Health <= 0) then
+                continue
+            end
+
+            local targetPart = player.Character:FindFirstChild(MergedAimbot.Settings.LockPart)
+            if not targetPart then
+                continue
+            end
+
+            local screenPoint, onScreen = Camera:WorldToViewportPoint(targetPart.Position)
+            local mousePos = Vector2.new(UserInputService:GetMouseLocation().X, UserInputService:GetMouseLocation().Y)
+            local distToMouse = (Vector2.new(screenPoint.X, screenPoint.Y) - mousePos).Magnitude
+
+            if distToMouse <= MergedAimbot.FOVSettings.Radius then
+                local distanceSq = (camPos - targetPart.Position).Magnitude^2
+                if distanceSq < shortestDistanceSq then
+                    if MergedAimbot.Settings.WallCheck then
+                        if not hasLineOfSight(camPos, targetPart.Position, player.Character) then
+                            continue
+                        end
+                    end
+                    shortestDistanceSq = distanceSq
+                    nearestPlayer = player
+                end
+            end
+        end
+    end
+    return nearestPlayer
+end
+
+RunService.RenderStepped:Connect(function(deltaTime)
+    if MergedAimbot.FOVSettings.Enabled then
+        local mousePos = UserInputService:GetMouseLocation()
+        FOVCircle.Position = Vector2.new(mousePos.X, mousePos.Y)
+        if MergedAimbot.FOVSettings.RainbowColor then
+            FOVCircle.Color = GetRainbowColor()
+        else
+            FOVCircle.Color = MergedAimbot.FOVSettings.Color
+        end
+    end
+
+    if MergedAimbot.Settings.Enabled then
+        local target = getNearestPlayer()
+        MergedAimbot.Target = target
+
+        if target and target.Character then
+            local character = target.Character
+            local head = character:FindFirstChild("Head")
+            local root = character:FindFirstChild("HumanoidRootPart")
+            if head and root then
+                local targetPosition
+                if character:FindFirstChildOfClass("Humanoid") and character:FindFirstChildOfClass("Humanoid").MoveDirection.Magnitude > 0 then
+                    targetPosition = root.Position
+                else
+                    targetPosition = head.Position
+                end
+
+                if MergedAimbot.Settings.LockMode == 2 then
+                    local screenPoint = Camera:WorldToViewportPoint(targetPosition)
+                    local mousePos = UserInputService:GetMouseLocation()
+                    local deltaX = (screenPoint.X - mousePos.X) / MergedAimbot.Settings.Sensitivity2
+                    local deltaY = (screenPoint.Y - mousePos.Y) / MergedAimbot.Settings.Sensitivity2
+                    mousemoverel(deltaX, deltaY)
+                else
+                    if MergedAimbot.Settings.Sensitivity > 0 then
+                        local tweenInfo = TweenInfo.new(MergedAimbot.Settings.Sensitivity, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+                        local newCFrame = CFrame.new(Camera.CFrame.Position, targetPosition)
+                        local tween = TweenService:Create(Camera, tweenInfo, {CFrame = newCFrame})
+                        tween:Play()
+                    else
+                        Camera.CFrame = CFrame.new(Camera.CFrame.Position, targetPosition)
+                    end
+                    UserInputService.MouseDeltaSensitivity = 0
+                end
+
+                if MergedAimbot.Settings.FireMode == "auto" then
+                    mouse1Click()
+                elseif MergedAimbot.Settings.FireMode == "hold" then
+                    if not UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
+                        mouse1Press()
+                    end
+                else
+                    mouse1Release()
+                end
+            end
+        else
+            UserInputService.MouseDeltaSensitivity = 1
+        end
+    else
+        UserInputService.MouseDeltaSensitivity = 1
+        MergedAimbot.Target = nil
+    end
+end)
+
+RunService.Heartbeat:Connect(function()
+    if MergedAimbot.ESPEnabled then
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character then
+                local character = player.Character
+                local humanoid = character:FindFirstChildOfClass("Humanoid")
+                if humanoid and humanoid.Health > 0 then
+                    local teamColor = Color3.new(1, 1, 1)
+                    if player.Team and player.TeamColor then
+                        teamColor = player.TeamColor.Color
+                    end
+
+                    local highlight = character:FindFirstChild("ESP_Highlight")
+                    if not highlight then
+                        highlight = Instance.new("Highlight")
+                        highlight.Name = "ESP_Highlight"
+                        highlight.FillTransparency = 1
+                        highlight.OutlineTransparency = 0
+                        highlight.OutlineColor3 = teamColor
+                        highlight.Parent = character
+                    else
+                        highlight.OutlineColor3 = teamColor
+                    end
+                else
+                    local highlight = character:FindFirstChild("ESP_Highlight")
+                    if highlight then
+                        highlight:Destroy()
+                    end
+                end
+            end
+        end
+    else
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character then
+                local highlight = player.Character:FindFirstChild("ESP_Highlight")
+                if highlight then
+                    highlight:Destroy()
+                end
+            end
+        end
+    end
+end)
+
+function MergedAimbot:Exit()
+    FOVCircle:Remove()
+    if MergedAimbot.ScreenGui then
+        MergedAimbot.ScreenGui:Destroy()
+    end
+    UserInputService.MouseDeltaSensitivity = 1
+    self.Settings.Enabled = false
+end
+
+getgenv().MergedAimbot = MergedAimbot
