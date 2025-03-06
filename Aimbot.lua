@@ -55,26 +55,26 @@ end
 ------------------------------------------------------------
 local MergedAimbot = {
     Settings = {
-        Enabled = false,             -- Aimbot ativado/desativado
-        FireMode = "none",           -- Valores: "none", "auto", "hold"
-        LockMode = 1,                -- 1 = CFrame; 2 = mousemoverel
-        LockPart = "Head",           -- Parte do corpo para mirar
-        Sensitivity = 0,             -- Se > 0, usa Tween para suavização; 0 = instantâneo
-        Sensitivity2 = 3.5,          -- Sensibilidade para modo mousemoverel
-        TeamCheck = true,            -- Ignora jogadores do mesmo time
-        AliveCheck = true,           -- Ignora jogadores mortos
-        WallCheck = false,           -- Realiza checagem de obstáculos (linha de visão)
+        Enabled = false,
+        FireMode = "none",
+        LockMode = 1,
+        LockPart = "Head",
+        Sensitivity = 0,
+        Sensitivity2 = 3.5,
+        TeamCheck = true,
+        AliveCheck = true,
+        WallCheck = false,
     },
     FOVSettings = {
         Enabled = true,
         Radius = 90,
         Color = Color3.fromRGB(255, 255, 255),
         LockedColor = Color3.fromRGB(255, 150, 150),
-        RainbowColor = false,        -- Se verdadeiro, o círculo FOV muda de cor dinamicamente
-        RainbowSpeed = 1,            -- Velocidade do efeito rainbow
+        RainbowColor = false,
+        RainbowSpeed = 1,
     },
-    ESPEnabled = true,              -- Habilita ESP (nome sobre os jogadores)
-    Target = nil,                   -- Alvo atual
+    ESPEnabled = true,
+    Target = nil,
 }
 
 ------------------------------------------------------------
@@ -103,8 +103,8 @@ screenGui.Parent = PlayerGui
 
 local mainContainer = Instance.new("Frame")
 mainContainer.Name = "MainContainer"
-mainContainer.Size = UDim2.new(0.6, 0, 0.7, 0)        -- 60% da largura e 70% da altura da tela
-mainContainer.Position = UDim2.new(0.2, 0, 0.15, 0)     -- Centralizado
+mainContainer.Size = UDim2.new(0.6, 0, 0.7, 0)
+mainContainer.Position = UDim2.new(0.2, 0, 0.15, 0)
 mainContainer.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 mainContainer.BorderSizePixel = 0
 mainContainer.Parent = screenGui
@@ -112,7 +112,7 @@ makeDraggable(mainContainer)
 
 local sideBar = Instance.new("Frame")
 sideBar.Name = "SideBar"
-sideBar.Size = UDim2.new(0.2, 0, 1, 0)              -- 20% da largura do container principal
+sideBar.Size = UDim2.new(0.2, 0, 1, 0)
 sideBar.Position = UDim2.new(0, 0, 0, 0)
 sideBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 sideBar.BorderSizePixel = 0
@@ -120,18 +120,17 @@ sideBar.Parent = mainContainer
 
 local contentContainer = Instance.new("Frame")
 contentContainer.Name = "ContentContainer"
-contentContainer.Size = UDim2.new(0.8, 0, 1, 0)         -- 80% do container principal
+contentContainer.Size = UDim2.new(0.8, 0, 1, 0)
 contentContainer.Position = UDim2.new(0.2, 0, 0, 0)
 contentContainer.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 contentContainer.BorderSizePixel = 0
 contentContainer.Parent = mainContainer
 
--- Nova aba "Início" foi adicionada no topo
 local tabs = {"Início", "Aimbot", "ESP", "Config", "Misc"}
 local pages = {}
 local currentPage = nil
-local tabButtonHeight = 40  -- Altura fixa de cada aba em pixels
-local tabSpacing = 5        -- Espaçamento entre as abas
+local tabButtonHeight = 40
+local tabSpacing = 5
 
 for i, tabName in ipairs(tabs) do
     local tabButton = Instance.new("TextButton")
@@ -167,7 +166,7 @@ for i, tabName in ipairs(tabs) do
 
     if tabName == "Início" then
         pageLabel.Text = "DESTRUA-SE ROBLOX"
-        
+
         local userInfo = Instance.new("TextLabel")
         userInfo.Name = "UserInfo"
         userInfo.Size = UDim2.new(1, 0, 0, 80)
@@ -235,7 +234,6 @@ resizeHandle.InputChanged:Connect(function(input)
     end
 end)
 
--- Criação de um container para os botões de Discord e YouTube na parte inferior da sidebar
 local bottomContainer = Instance.new("Frame")
 bottomContainer.Name = "BottomContainer"
 bottomContainer.Size = UDim2.new(1, 0, 0, 70)
@@ -243,7 +241,6 @@ bottomContainer.Position = UDim2.new(0, 0, 1, -70)
 bottomContainer.BackgroundTransparency = 1
 bottomContainer.Parent = sideBar
 
--- Botão do Discord com imagem e texto
 local discordButton = Instance.new("TextButton")
 discordButton.Name = "DiscordButton"
 discordButton.Size = UDim2.new(1, 0, 0, 30)
@@ -263,7 +260,6 @@ discordIcon.BackgroundTransparency = 1
 discordIcon.Image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGew1wzyPacpck97bVtg_oNcwMkgWr2-SSP_gFPGv37W2DvAeQPY7hPOQ&s=10"
 discordIcon.Parent = discordButton
 
--- Botão do YouTube com imagem e texto
 local youtubeButton = Instance.new("TextButton")
 youtubeButton.Name = "YouTubeButton"
 youtubeButton.Size = UDim2.new(1, 0, 0, 30)
@@ -283,7 +279,6 @@ youtubeIcon.BackgroundTransparency = 1
 youtubeIcon.Image = "https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png"
 youtubeIcon.Parent = youtubeButton
 
--- Redirecionamento ao clicar (PC: abre navegador; mobile: tenta copiar link)
 discordButton.MouseButton1Click:Connect(function()
     local url = "https://discord.gg/tuEawMf34u"
     local success = pcall(function()
@@ -451,7 +446,7 @@ gui.autoFireButton.MouseButton1Click:Connect(function()
         MergedAimbot.Settings.FireMode = "auto"
     end
     updateAutoFireButton()
-    updateHoldFireButton() -- Garante que somente um modo esteja ativo
+    updateHoldFireButton()
     wait(0.2)
     debounce.autoFire = false
 end)
@@ -465,7 +460,7 @@ gui.holdFireButton.MouseButton1Click:Connect(function()
         MergedAimbot.Settings.FireMode = "hold"
     end
     updateHoldFireButton()
-    updateAutoFireButton() -- Garante que somente um modo esteja ativo
+    updateAutoFireButton()
     wait(0.2)
     debounce.holdFire = false
 end)
@@ -623,8 +618,7 @@ end)
 
 ------------------------------------------------------------
 -- Loop de Atualização do ESP (Heartbeat)
-----------------------------------------------------------
-
+------------------------------------------------------------
 RunService.Heartbeat:Connect(function()
     if MergedAimbot.ESPEnabled then
         for _, player in pairs(Players:GetPlayers()) do
@@ -640,7 +634,7 @@ RunService.Heartbeat:Connect(function()
                         esp.Adornee = hrp
                         esp.Size = UDim2.new(0, 200, 0, 50)
                         esp.StudsOffset = Vector3.new(0, 2, 0)
-                        
+
                         local label = Instance.new("TextLabel", esp)
                         label.Size = UDim2.new(1, 0, 1, 0)
                         label.BackgroundTransparency = 1
