@@ -12,6 +12,7 @@ local Mouse = LocalPlayer:GetMouse()
 local MergedAimbot = {
 	Settings = {
 		Enabled = false,
+		FireMode = "none",
 		LockMode = 1,
 		LockPart = "Head",
 		Sensitivity = 0,
@@ -121,33 +122,33 @@ for i, tabName in ipairs(tabs) do
 	tabButton.Text = tabName
 	tabButton.Parent = sideBar
 
-	local page = Instance.new("Frame")
-	page.Name = "Page_" .. tabName
-	page.Size = UDim2.new(1, 0, 1, 0)
-	page.Position = UDim2.new(0, 0, 0, 0)
-	page.BackgroundColor3 = Color3.fromRGB(30, 50, 50)
-	page.BorderSizePixel = 0
-	page.Visible = false
-	page.Parent = contentContainer
-	pages[tabName] = page
+	local page = Instance.new("Frame")  
+	page.Name = "Page_" .. tabName  
+	page.Size = UDim2.new(1, 0, 1, 0)  
+	page.Position = UDim2.new(0, 0, 0, 0)  
+	page.BackgroundColor3 = Color3.fromRGB(30, 50, 50)  
+	page.BorderSizePixel = 0  
+	page.Visible = false  
+	page.Parent = contentContainer  
+	pages[tabName] = page  
 
-	local pageLabel = Instance.new("TextLabel")
-	pageLabel.Name = "TitleLabel"
-	pageLabel.Size = UDim2.new(1, 0, 0, 30)
-	pageLabel.Position = UDim2.new(0, 0, 0, 0)
-	pageLabel.BackgroundTransparency = 1
-	pageLabel.Text = "Configurações de " .. tabName
+	local pageLabel = Instance.new("TextLabel")  
+	pageLabel.Name = "TitleLabel"  
+	pageLabel.Size = UDim2.new(1, 0, 0, 30)  
+	pageLabel.Position = UDim2.new(0, 0, 0, 0)  
+	pageLabel.BackgroundTransparency = 1  
+	pageLabel.Text = "Configurações de " .. tabName  
 	pageLabel.TextColor3 = Color3.new(1, 1, 1)
 	pageLabel.Font = Enum.Font.GothamSemibold
 	pageLabel.TextSize = 18
-	pageLabel.Parent = page
+	pageLabel.Parent = page  
 
-	tabButton.MouseButton1Click:Connect(function()
-		if currentPage then
-			currentPage.Visible = false
-		end
-		page.Visible = true
-		currentPage = page
+	tabButton.MouseButton1Click:Connect(function()  
+		if currentPage then  
+			currentPage.Visible = false  
+		end  
+		page.Visible = true  
+		currentPage = page  
 	end)
 end
 
@@ -217,6 +218,22 @@ minimizeButton.MouseButton1Click:Connect(function()
 		mainContainer.Visible = false
 		isMinimized = true
 	end
+end)
+
+-- Botão para destruir o GUI (X)
+local destroyButton = Instance.new("TextButton")
+destroyButton.Name = "DestroyButton"
+destroyButton.Size = UDim2.new(0, 50, 0, 25)
+destroyButton.Position = UDim2.new(1, -110, 0, 5)
+destroyButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+destroyButton.TextColor3 = Color3.new(1, 1, 1)
+destroyButton.Font = Enum.Font.GothamBold
+destroyButton.TextSize = 18
+destroyButton.Text = "X"
+destroyButton.Parent = mainContainer
+
+destroyButton.MouseButton1Click:Connect(function()
+	MergedAimbot:Exit()
 end)
 
 do
@@ -312,9 +329,310 @@ do
 	end)
 	currentY = currentY + 60
 
+	-- Labels adicionais
 	createLabel("DESTRUA-SE ROBLOX", 25)
 	createLabel("Jinxscripts", 25)
 	createLabel("\"not\" Justadev", 25)
+
+	-- Botão "Aumentar FPS" que define os fastflags
+	local fpsButton = Instance.new("TextButton")
+	fpsButton.Size = UDim2.new(0, 200, 0, 30)
+	fpsButton.Position = UDim2.new(0, 10, 0, currentY)
+	fpsButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+	fpsButton.TextColor3 = Color3.new(1, 1, 1)
+	fpsButton.Font = Enum.Font.GothamBold
+	fpsButton.TextSize = 16
+	fpsButton.Text = "Aumentar FPS"
+	fpsButton.Parent = miscPage
+	fpsButton.MouseButton1Click:Connect(function()
+		-- Defina os fastflags conforme os JSONs fornecidos
+		local fastFlags = {
+			["FIntRenderMaxShadowAtlasUsageBeforeDownscale"] = "1",
+			["FFlagDebugSelfViewPerfBenchmark"] = "False",
+			["FFlagSelfViewAvoidErrorOnWrongFaceControlsParenting"] = "False",
+			["DFFlagVoiceChatTurnOnMuteUnmuteNotificationHack"] = "False",
+			["FFlagRenderDebugCheckThreading2"] = "True",
+			["FFlagFixReducedMotionStuckIGM2"] = "True",
+			["DFIntCSGLevelOfDetailSwitchingDistance"] = "0",
+			["FIntRuntimeMaxNumOfThreads"] = "2400",
+			["FFlagCSGDecalOptimizeVB"] = "True",
+			["DFIntDebugAdditionalNumberOfMipsToSkipForNonAlbedoTextures"] = "0",
+			["FFlagToastNotificationsResendDisplayOnInit"] = "False",
+			["DFIntMicroProfilerDpiScaleOverride"] = "100",
+			["FFlagLuaAppsEnableParentalControlsTab"] = "False",
+			["FFlagDisableFeedbackSoothsayerCheck"] = "False",
+			["FFlagControlBetaBadgeWithGuac"] = "False",
+			["FFlagFixSensitivityTextPrecision"] = "False",
+			["FFlagDebugDeterministicParticles"] = "False",
+			["DFIntNumAssetsMaxToPreload"] = "2147483647",
+			["FIntEnableVisBugChecksHundredthPercent27"] = "0",
+			["FIntCameraMaxZoomDistance"] = "999999",
+			["FFlagMigrateTextureManagerIsLocalAsset"] = "True",
+			["FFlagRenderLightGridEfficientTextureAtlasUpdate"] = "True",
+			["DFFlagGraphicsOptimizationModeMVPExposureEnrollment3"] = "False",
+			["FFlagRemovedRbxRenderingPreProcessor"] = "False",
+			["FIntAXAdaptiveScrollingJustSelectedMillis"] = "2000",
+			["FFlagEngineAPICloudProcessingUseNotificationClient"] = "False",
+			["FFlagDebugCodegenOptSize"] = "True",
+			["FFlagEnableCommandAutocomplete"] = "False",
+			["FFlagEnableBubbleChatFromChatService"] = "False",
+			["FIntUITextureMaxUpdateDepth"] = "-1",
+			["FIntRomarkStartWithGraphicQualityLevel"] = "1",
+			["FFlagAXAdaptiveScrollingItemResetFix2"] = "True",
+			["DFFlagAssetPreloadingUrlVersionEnabled2"] = "True",
+			["FStringVoiceBetaBadgeLearnMoreLink"] = "null",
+			["DFFlagUseVisBugChecks"] = "True",
+			["FFlagFastGPULightCulling3"] = "True",
+			["FFlagFRMRefactor"] = "False",
+			["FFlagBetaBadgeLearnMoreLinkFormview"] = "False",
+			["FFlagVRLaserPointerOptimization"] = "True",
+			["FLogNetwork"] = "7",
+			["FFlagRenderNoLowFrmBloom"] = "False",
+			["DFFlagEnableMeshPreloading2"] = "True",
+			["FFlagRenderFixFog"] = "True",
+			["FFlagSelfViewUpdatedCamFraming"] = "False",
+			["FFlagEnablePreferredTextSizeStyleFixesInExperienceMenu"] = "True",
+			["DFIntTimestepArbiterThresholdCFLThou"] = "300",
+			["DFFlagAudioEnableVolumetricPanningForPolys"] = "True",
+			["FFlagLuaAppGamesPagePreloadingDisabled"] = "False",
+			["FFlagRemoveRedundantFontPreloading"] = "True",
+			["DFIntTeleportClientAssetPreloadingHundredthsPercentage"] = "100000",
+			["FFlagStudioDataCollectionAddBasicNotification"] = "False",
+			["FFlagEnablePreferredTextSizeStyleFixesInPurchasePrompt"] = "True",
+			["DFIntWindowsWebViewTelemetryThrottleHundredthsPercent"] = "0",
+			["FIntDebugFRMOptionalMSAALevelOverride"] = "1",
+			["FFlagSelfViewTweaksPass"] = "False",
+			["FFlagUserShowGuiHideToggles"] = "True",
+			["DFIntCSGLevelOfDetailSwitchingDistanceL23"] = "0",
+			["FIntTerrainOTAMaxTextureSize"] = "4",
+			["FFlagShaderLightingRefactor"] = "True",
+			["FFlagHandleAltEnterFullscreenManually"] = "False",
+			["FFlagDebugSSAOForce"] = "False",
+			["DFIntCSGLevelOfDetailSwitchingDistanceL34"] = "0",
+			["DFFlagTeleportClientAssetPreloadingEnabledIXP2"] = "True",
+			["FIntGrassMovementReducedMotionFactor"] = "0",
+			["FFlagQuaternionPoseCorrection"] = "True",
+			["FIntFRMMinGrassDistance"] = "0",
+			["FFlagPreloadAllFonts"] = "True",
+			["FFlagFixCountOfUnreadNotificationError"] = "False",
+			["FFlagDebugDisableTelemetryV2Stat"] = "True",
+			["FFlagEnablePreferredTextSizeGuiService"] = "True",
+			["FFlagEnablePreferredTextSizeStyleFixesInReportMenu"] = "True",
+			["FFlagSyncWebViewCookieToEngine2"] = "False",
+			["DFIntCSGLevelOfDetailSwitchingDistanceL12"] = "0",
+			["FFlagTopBarUseNewBadge"] = "False",
+			["FFlagUserHideCharacterParticlesInFirstPerson"] = "True",
+			["FFlagEnablePreferredTextSizeSettingInMenus2"] = "True",
+			["DFIntDebugFRMQualityLevelOverride"] = "1",
+			["FIntRefreshRateLowerBound"] = "120",
+			["FIntVertexSmoothingGroupTolerance"] = "1",
+			["FFlagEnableBetterHapticsResultHandling"] = "True",
+			["FFlagEnableExperienceNotificationPrompts2"] = "False",
+			["DFFlagSimOptimizeSetSize"] = "True",
+			["DFFlagEnableTexturePreloading"] = "True",
+			["DFIntAnimationLodFacsDistanceMax"] = "0",
+			["FFlagEnableAudioPannerFiltering"] = "True",
+			["FFlagUseNotificationsLocalization"] = "False",
+			["DFIntPerformanceControlTextureQualityBestUtility"] = "-1",
+			["FFlagNotificationButtonTypeVariantMappingEmphasis"] = "False",
+			["FIntVRTouchControllerTransparency"] = "0",
+			["FFlagFixParticleEmissionBias2"] = "False",
+			["FFlagDisablePostFx"] = "True",
+			["DFIntVoiceChatMaxRecordedDataDeliveryIntervalMs"] = "2147483647",
+			["FFlagEnableAudioEmitterDistanceAttenuation"] = "True",
+			["FFlagDebugDisableTelemetryEventIngest"] = "True",
+			["FFlagDisableChromeV3StaticSelfView"] = "False",
+			["FFlagNewOptimizeNoCollisionPrimitiveInMidphase637"] = "True",
+			["FFlagRenderLegacyShadowsQualityRefactor"] = "True",
+			["FFlagEnablePreferredTextSizeScalePerLayerCollector"] = "True",
+			["FIntUnifiedLightingBlendZone"] = "1",
+			["DFIntVideoMaxNumberOfVideosPlaying"] = "0",
+			["FIntSSAOMipLevels"] = "1",
+			["FFlagEnableVRFTUXExperienceV2"] = "True",
+			["DFIntContentProviderPreloadHangTelemetryHundredthsPercentage"] = "0",
+			["FFlagLoginPageOptimizedPngs"] = "True",
+			["FFlagUpdateHTTPCookieStorageFromWKWebView"] = "False",
+			["FFlagSelfViewRemoveVPFWhenClosed"] = "False",
+			["FIntRenderGrassDetailStrands"] = "0",
+			["FFlagDebugEnableDirectAudioOcclusion2"] = "True",
+			["FFlagFixSelfViewPopin"] = "False",
+			["FFlagPreOptimizeNoCollisionPrimitive"] = "True",
+			["FIntRenderShadowIntensity"] = "0",
+			["FFlagDeveloperToastNotificationsEnabled"] = "False",
+			["FIntSelfViewTooltipLifetime"] = "0",
+			["FFlagNotificationsNoLongerRequireControllerState"] = "False",
+			["DFIntMacWebViewTelemetryThrottleHundredthsPercent"] = "0",
+			["FFlagVRMouseMoveOptimization"] = "True",
+			["FFlagContentProviderPreloadHangTelemetry"] = "False",
+			["DFFlagSimSolverOptimizeGeometricStiffness4"] = "True",
+			["FStringTerrainMaterialTable2022"] = "",
+			["FFlagNotificationPluginSignalRReadEvents"] = "False",
+			["FFlagClientToastNotificationsEnabled"] = "False",
+			["FFlagAXPortraitSplitAdaptiveScrollingFix2"] = "True",
+			["FFlagSimEnableDCD16"] = "True",
+			["FIntRenderLocalLightUpdatesMin"] = "1",
+			["DFFlagOpenCloudV1CreateUserNotificationAsync"] = "False",
+			["FFlagAXSearchLandingPageIXPEnabled4"] = "False",
+			["FFlagDebugDisableTelemetryEphemeralStat"] = "True",
+			["FIntTextureCompositorLowResFactor"] = "4",
+			["DFFlagPhysicsMechanismCacheOptimizeAlloc"] = "True",
+			["FFlagFixParticleAttachmentCulling"] = "False",
+			["DFFlagAudioEnableVolumetricPanningForMeshes"] = "True",
+			["FIntStudioWebView2TelemetryHundredthsPercent"] = "0",
+			["DFIntTextureQualityOverride"] = "0",
+			["FIntFullscreenTitleBarTriggerDelayMillis"] = "3600000",
+			["FIntRobloxGuiBlurIntensity"] = "0",
+			["FFlagGuiHidingApiSupport2"] = "True",
+			["DFFlagOptimizeIsA"] = "True",
+			["FFlagEnableChromeFTUX"] = "True",
+			["DFFlagAdsPreloadInteractivityAssets"] = "True",
+			["DFFlagSimRefactorCollisionGeometry2"] = "True",
+			["DFIntTeleportClientAssetPreloadingHundredthsPercentage2"] = "100000",
+			["FFlagGraphicsGLEnableSuperHQShadersExclusion"] = "False",
+			["FFlagEnablePreferredTextSizeStyleFixesAddFriends"] = "True",
+			["FIntFriendRequestNotificationThrottle"] = "0",
+			["FFlagDebugSkyGray"] = "True",
+			["FFlagUseNotificationServiceIsConnected"] = "False",
+			["FIntTargetRefreshRate"] = "144",
+			["DFFlagDebugSkipMeshVoxelizer"] = "True",
+			["FIntFixForBulkPresenceNotifications"] = "0",
+			["DFIntRakNetMtuValue3InBytes"] = "1250",
+			["DFFlagEnableSoundPreloading"] = "True",
+			["FIntFRMMaxGrassDistance"] = "0",
+			["FFlagWindowsReportAbuseNotification"] = "False",
+			["FFlagAXAdaptiveScrollingAvatarEditor2"] = "True",
+			["FFlagSelfViewLookUpHumanoidByType"] = "False",
+			["DFFlagEngineAPISendNotificationClientAnalytics"] = "False",
+			["FStringInExperienceNotificationsLayer"] = "",
+			["DFIntHttpParallelLimit_RequestExperienceNotificationService"] = "0",
+			["DFFlagDisableDPIScale"] = "False",
+			["DFIntHACDPointSampleDistApartTenths"] = "2147483647",
+			["FFlagDebugForceGenerateHSR"] = "True",
+			["DFIntCanHideGuiGroupId"] = "32380007",
+			["FFlagVoiceBetaBadge"] = "False",
+			["FIntDebugForceMSAASamples"] = "1",
+			["FFlagDebugForceFSMCPULightCulling"] = "True",
+			["FIntDebugTextureManagerSkipMips"] = "5",
+			["FIntDirectionalAttenuationMaxPoints"] = "1",
+			["FFlagGraphicsGLEnableHQShadersExclusion"] = "False",
+			["FFlagPreloadTextureItemsOption4"] = "True",
+			["DFIntTaskSchedulerTargetFps"] = "9999",
+			["DFFlagUnifyLegacyJointGeometry"] = "True",
+			["DFFlagDebugRenderForceTechnologyVoxel"] = "True",
+			["FFlagSelfViewMoreNilChecks"] = "False",
+			["FIntStudioExternalNotificationImplMessageWriteTimeOut"] = "0",
+			["FFlagDebugEnableVRFTUXExperienceInStudio"] = "True",
+			["FFlagFixExitDialogBlockVRView"] = "True",
+			["FFlagSelfViewCameraDefaultButtonInViewPort"] = "False",
+			["DFFlagOptimizeClusterCacheAlloc"] = "True",
+			["DFStringAltTelegrafAddress"] = "127.0.0.1",
+			["DFIntCullFactorPixelThresholdShadowMapLowQuality"] = "2147483647",
+			["FFlagDebugDisableTelemetryV2Event"] = "True",
+			["FFlagVideoTextureSupportHardwareRender"] = "True",
+			["FFlagDebugRenderingSetDeterministic"] = "True",
+			["FFlagFixEmotesMenuVR"] = "True",
+			["FFlagVisBugChecksThreadYield"] = "True",
+			["FFlagAdaptiveScrollingFrameOnServer"] = "True",
+			["FFlagEnablePreferredTextSizeStyleFixesInPlayerList"] = "True",
+			["DFIntCullFactorPixelThresholdShadowMapHighQuality"] = "2147483647",
+			["FFlagImproveShiftLockTransition"] = "True",
+			["DFFlagTeleportPreloadingMetrics5"] = "True",
+			["FFlagVRBackpackImproved"] = "True",
+			["FFlagFixIGMTabTransitions"] = "True",
+			["FFlagAXFixAdaptiveScrollingSnapAndroid"] = "True",
+			["DFFlagTeleportClientAssetPreloadingDoingExperiment2"] = "True",
+			["FIntTaskSchedulerThreadMin"] = "3",
+			["FFlagAXAdaptiveScrollingImprovementIXPEnabled"] = "True",
+			["DFIntRakNetMtuValue2InBytes"] = "1337",
+			["FFlagFixIGMBottomBarVisibility"] = "True",
+			["FFlagRenderOptimizeDecalTransparencyInvalidation"] = "True",
+			["FStringGraphicsDisableUnalignedDxtGPUNameBlacklist"] = "null",
+			["DFIntAnimationLodFacsDistanceMin"] = "0",
+			["DFFlagAudioUseVolumetricPanning"] = "True",
+			["FIntBootstrapperWebView2InstallationTelemetryHundredthPercent"] = "0",
+			["FFlagSignalRNotificationManagerMaybeStart"] = "False",
+			["FFlagAssetPreloadingIXP"] = "True",
+			["DFFlagTeleportClientAssetPreloadingEnabledIXP"] = "True",
+			["FFlagFixChunkLightingUpdate2"] = "True",
+			["FIntRenderLocalLightUpdatesMax"] = "1",
+			["FFlagEnableIOSWebViewCookieSyncFix"] = "False",
+			["DFIntMaxFrameBufferSize"] = "4",
+			["FFlagSelfViewHumanoidNilCheck"] = "False",
+			["FFlagSelfieViewEnabled"] = "True",
+			["FFlagToastNotificationsProtocolEnabled2"] = "False",
+			["DFFlagWindowsWebViewTelemetryEnabled"] = "False",
+			["FFlagInExperienceUpsellSelfViewFix"] = "False",
+			["DFFlagTextureQualityOverrideEnabled"] = "False",
+			["FFlagAdServiceEnabled"] = "False",
+			["DFFlagEnableExperienceNotificationOptInPrompt"] = "False",
+			["FFlagRenderSkipReadingShaderData"] = "False",
+			["FFlagPreferredTextSizeSettingBetaFeature"] = "True",
+			["FIntTerrainArraySliceSize"] = "0",
+			["FFlagFixOutdatedTimeScaleParticles"] = "False",
+			["DFIntDefaultTimeoutTimeMs"] = "10000",
+			["FIntSmoothTerrainPhysicsCacheSize"] = "1",
+			["FIntRenderLocalLightFadeInMs"] = "0",
+			["FFlagEnablePreferredTextSizeStyleFixesGameTile"] = "True",
+			["FFlagDebugStudioForceSystemDeprecationNotification"] = "False",
+			["FFlagGraphicsTextureCopy"] = "True",
+			["FIntPreferredTextSizeSettingBetaFeatureRolloutPercent"] = "100",
+			["DFFlagTeleportClientAssetPreloadingDoingExperiment"] = "True",
+			["FFlagDebugGraphicsPreferD3D11"] = "True",
+			["DFFlagDebugOverrideDPIScale"] = "False",
+			["FIntRenderShadowmapBias"] = "-1",
+			["FFlagDebugDisableTelemetryEphemeralCounter"] = "True",
+			["FFlagShoeSkipRenderMesh"] = "False",
+			["FFlagMockOpenSelfViewForCameraUser"] = "False",
+			["FFlagViewCollisionFadeToBlackInVR"] = "False",
+			["DFIntAnimationLodFacsVisibilityDenominator"] = "0",
+			["FFlagAXAdaptiveScrollingSnapItemEditor"] = "True",
+			["FFlagEnablePreferredTextSizeStyleFixesInCaptureMenu"] = "True",
+			["DFIntRakNetMtuValue1InBytes"] = "1396",
+			["FFlagEnablePreferredTextSizeStyleFixesInAppShell3"] = "True",
+			["FFlagSettingsHubIndependentBackgroundVisibility"] = "True",
+			["FFlagFixSettingsHubVRBackgroundError"] = "True",
+			["DFFlagAudioToggleVolumetricPanning"] = "True",
+			["FFlagDebugCheckRenderThreading"] = "True",
+			["FFlagCoreGuiSelfViewVisibilityFixed"] = "False",
+			["FIntBloomFrmCutoff"] = "-1",
+			["FFlagRenderCBRefactor2"] = "True",
+			["FFlagEnableVisBugChecks27"] = "True",
+			["FFlagEnablePreferredTextSizeConnection"] = "True",
+			["FFlagNewLightAttenuation"] = "True",
+			["DFFlagTeleportClientAssetPreloadingEnabled9"] = "True",
+			["FFlagRenderShadowSkipHugeCulling"] = "True",
+			["DFStringWebviewUrlAllowlist"] = "",
+			["FFlagChatTranslationEnableSystemMessage"] = "False",
+			["DFFlagOptimizeNoCollisionPrimitiveInMidphaseCrash"] = "True",
+			["FFlagSquadToastNotificationsEnabled"] = "False",
+			["FFlagTaskSchedulerLimitTargetFpsTo2402"] = "False",
+			["DFFlagDebugPerfMode"] = "True",
+			["FFlagEnableRemoveIsFromToastNotification"] = "False",
+			["FFlagUserEnableCameraToggleNotification"] = "False",
+			["DFFlagDebugPauseVoxelizer"] = "True",
+			["FIntStudioResendDisconnectNotificationInterval"] = "0",
+			["FFlagSelfViewGetRidOfFalselyRenderedFaceDecal"] = "False",
+			["FFlagToastNotificationsReceivedAndDismissedSignals"] = "False",
+			["FFlagPreloadMinimalFonts"] = "True",
+			["FFlagUserSoundsUseRelativeVelocity2"] = "True",
+			["FFlagDebugDisableTelemetryPoint"] = "True",
+			["FStringTerrainMaterialTablePre2022"] = "",
+			["FFlagUserFixLoadAnimationError"] = "True",
+			["DFFlagNotificationServiceIsConnectedProperty"] = "False",
+			["FFlagEnablePreferredTextSizeScale"] = "True",
+			["FFlagSelfViewFixes"] = "False",
+			["DFIntDebugLimitMinTextureResolutionWhenSkipMips"] = "0",
+			["FFlagToastNotificationsUpdateEventParams"] = "False",
+			["FFlagAvatarChatIncludeSelfViewOnTelemetry"] = "False",
+			["FFlagDebugDisableTelemetryV2Counter"] = "True",
+			["FFlagDontRerenderForBadTexture"] = "True",
+			["FStringWhitelistVerifiedUserId"] = "1307880661"
+		}
+		for flag, value in pairs(fastFlags) do
+			pcall(function() setfflag(flag, value) end)
+		end
+		print("Fastflags aplicados para aumento de FPS!")
+	end)
 end
 
 do
@@ -435,6 +753,44 @@ do
 		sliderFrame.Position = UDim2.new(0, 10, 0, currentY)
 		sliderFrame.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 		sliderFrame.Parent = configControlsFrame
+
+		-- Criação de um handle para redimensionamento (exemplo)
+		local cornerResizeHandle = Instance.new("Frame")
+		cornerResizeHandle.Name = "CornerResizeHandle"
+		cornerResizeHandle.Size = UDim2.new(0, 20, 0, 20)
+		cornerResizeHandle.AnchorPoint = Vector2.new(1, 1)
+		cornerResizeHandle.Position = UDim2.new(1, 0, 1, 0)
+		cornerResizeHandle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		cornerResizeHandle.BorderSizePixel = 0
+		cornerResizeHandle.ZIndex = 3
+		cornerResizeHandle.Parent = mainContainer
+
+		local resizingCorner = false
+		local initialMousePos, initialSize
+
+		cornerResizeHandle.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 then
+				resizingCorner = true
+				initialMousePos = input.Position
+				initialSize = mainContainer.AbsoluteSize
+				input.Changed:Connect(function()
+					if input.UserInputState == Enum.UserInputState.End then
+						resizingCorner = false
+					end
+				end)
+			end
+		end)
+
+		UserInputService.InputChanged:Connect(function(input)
+			if resizingCorner and input.UserInputType == Enum.UserInputType.MouseMovement then
+				local delta = input.Position - initialMousePos
+				local minSize = 25
+				local maxSize = 300
+				local newWidth = math.clamp(initialSize.X + delta.X, minSize, maxSize)
+				local newHeight = math.clamp(initialSize.Y + delta.Y, minSize, maxSize)
+				mainContainer.Size = UDim2.new(0, newWidth, 0, newHeight)
+			end
+		end)
 
 		local knob = Instance.new("Frame")
 		knob.Size = UDim2.new(0, 10, 1, 0)
@@ -574,6 +930,7 @@ do
 		end)
 		currentY = currentY + 30
 	end
+
 end
 
 print("Merged Aimbot com UI customizada carregado com sucesso!")
@@ -662,6 +1019,16 @@ RunService.RenderStepped:Connect(function(deltaTime)
 						Camera.CFrame = CFrame.new(Camera.CFrame.Position, targetPosition)
 					end
 					UserInputService.MouseDeltaSensitivity = 0
+				end
+
+				if MergedAimbot.Settings.FireMode == "auto" then
+					mouse1Click()
+				elseif MergedAimbot.Settings.FireMode == "hold" then
+					if not UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
+						mouse1Press()
+					end
+				else
+					mouse1Release()
 				end
 			end
 		else
